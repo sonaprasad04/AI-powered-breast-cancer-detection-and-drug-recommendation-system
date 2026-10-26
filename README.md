@@ -106,7 +106,7 @@ This file contains a diagnosis column and numerical tumour measurements in the f
 
 datasets/GDSC_DATASET.csv
 
-The provided dataset contains drug-response fields including DRUG_NAME, LN_IC50, AUC, cell-line details, cancer-type metadata, and target/pathway metadata. The current recommendation module uses it to train its regression model at import time.
+This dataset contains drug-response fields including DRUG_NAME, LN_IC50, AUC, cell-line details, cancer-type metadata, and target/pathway metadata. The current recommendation module uses it to train its regression model at import time.
 
 datasets/Compounds-annotation.csv
 
@@ -129,20 +129,25 @@ SMARTCARE/
 │   ├── schemas.py
 │   ├── security.py
 │   └── smartcare.db
+│
 ├── datasets/
 │   ├── breast_cancer.csv
 │   ├── Compounds-annotation.csv
 │   └── GDSC_DATASET.csv
+│
 ├── frontend/
 │   ├── detection.html
 │   ├── input.html
 │   ├── login.html
 │   └── register.html
+│
 ├── cancer_classification.ipynb
+├── drug_response_prediction.ipynb
+├── final_integration.ipynb
+├── pca.ipynb
 ├── cancer_model.pkl
 ├── drug_model.pkl
-├── drug_response_prediction.ipynb
-└── Conference Paper.docx
+└── README.md
 
 8. Setup and Installation
 
