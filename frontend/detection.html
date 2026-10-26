@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartCare - Diagnosis Result</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+
+<style>
+body {
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+.font-serif {
+  font-family: "Playfair Display", serif;
+}
+#historyPanel {
+  transition: transform 0.3s ease;
+  transform: translateX(100%);
+}
+#historyPanel.open {
+  transform: translateX(0);
+}
+</style>
+
+</head>
+
+<body class="bg-[#FAFAFB] text-slate-900">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="bg-white border-b px-8 py-4 flex justify-between items-center">
+
+  <div class="flex items-center gap-3">
+    <!-- UNIFIED LOGO -->
+    <div class="w-12 h-12 bg-pink-500 rounded-2xl flex items-center justify-center shadow-md">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24">
+        <path d="M4 14L8 10L12 14L16 8L20 12"
+          stroke="white" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <span class="text-xl font-bold">SmartCare</span>
+  </div>
+
+  <div class="flex items-center gap-6">
+
+    <!-- HISTORY BUTTON -->
+    <button onclick="toggleHistory()"
+      class="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-pink-600 transition uppercase tracking-wide">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      History
+    </button>
+
+    <!-- LOGOUT BUTTON -->
+    <button id="logoutBtn"
+      class="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-pink-600 transition uppercase tracking-wide">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
+      </svg>
+      Logout
+    </button>
+
+  </div>
+
+</nav>
+
+<!-- ================= HISTORY SLIDE PANEL ================= -->
+<div id="historyOverlay"
+  class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"
+  onclick="toggleHistory()">
+</div>
+
+<div id="historyPanel"
+  class="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 flex flex-col">
+  <div class="flex items-center justify-between px-6 py-5 border-b">
+    <h2 class="text-xl font-bold">Diagnosis History</h2>
+    <button onclick="toggleHistory()" class="text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
+  </div>
+  <div id="historyContent" class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+    <p class="text-gray-400 text-sm">Loading history...</p>
+  </div>
+</div>
+
+<!-- ================= MAIN ================= -->
+<main class="max-w-7xl mx-auto px-8 py-8">
+
+  <div class="mb-10">
+    <p class="text-pink-500 text-xs font-bold uppercase mb-2">● AI ANALYSIS COMPLETE</p>
+    <h1 class="text-4xl font-serif font-bold mb-2">Patient Diagnosis</h1>
+  </div>
+
+  <div class="grid grid-cols-2 gap-8">
+
+    <!-- LEFT SIDE -->
+    <div id="leftCard" class="bg-[#FFF1F2] border rounded-[40px] p-8 relative">
+      <div class="flex items-center gap-4 mb-6">
+        <div id="statusIcon" class="bg-pink-500 text-white p-3 rounded-xl">⚠</div>
+        <h2 id="statusText" class="text-3xl font-bold text-red-700">Loading...</h2>
+      </div>
+      <p id="statusMessage" class="text-red-500 mb-8">Loading result...</p>
+      <div class="space-y-5">
+        <div class="bg-white rounded-3xl p-6">
+          <p class="text-xs text-gray-400 uppercase mb-1">Model Confidence</p>
+          <div class="flex justify-between items-center">
+            <h3 id="confidenceText" class="text-3xl font-bold">0%</h3>
+            <span id="confidenceLabel" class="text-green-500 font-semibold"></span>
+          </div>
+          <div class="h-2 bg-gray-200 rounded mt-3">
+            <div id="confidenceBar" class="bg-pink-500 h-2 rounded" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-3xl p-6">
+          <p class="text-xs text-gray-400 uppercase mb-1">Overall Risk</p>
+          <h3 id="riskText" class="text-3xl font-bold text-red-600">--</h3>
+          <div class="h-2 bg-gray-200 rounded mt-3">
+            <div id="riskBar" class="bg-red-500 h-2 rounded" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="bg-white rounded-[40px] p-8 border shadow-sm">
+      <div class="mb-4">
+        <h3 class="text-xl font-bold mb-2">Treatment Recommendation</h3>
+        <p class="text-gray-400 text-xs uppercase mb-2">AI Generated Protocol</p>
+        <h2 id="drugText" class="text-4xl font-bold">--</h2>
+      </div>
+      <button onclick="downloadReport()"
+        class="mt-6 border px-6 py-3 rounded-xl hover:bg-gray-100 flex items-center gap-2">
+        📄 Download Report
+      </button>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+});
+
+// HISTORY
+async function toggleHistory() {
+  const panel = document.getElementById("historyPanel");
+  const overlay = document.getElementById("historyOverlay");
+  const isOpen = panel.classList.contains("open");
+  if (isOpen) {
+    panel.classList.remove("open");
+    overlay.classList.add("hidden");
+  } else {
+    panel.classList.add("open");
+    overlay.classList.remove("hidden");
+    await loadHistory();
+  }
+}
+
+async function loadHistory() {
+  const token = localStorage.getItem("token");
+  const container = document.getElementById("historyContent");
+  if (!token) { container.innerHTML = `<p class="text-red-400 text-sm">Not logged in.</p>`; return; }
+  container.innerHTML = `<p class="text-gray-400 text-sm">Loading...</p>`;
+  try {
+    const response = await fetch(`${API_URL}/my-patients`, {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await response.json();
+    if (!response.ok) { container.innerHTML = `<p class="text-red-400 text-sm">Error loading history.</p>`; return; }
+    if (data.length === 0) { container.innerHTML = `<p class="text-gray-400 text-sm">No records found.</p>`; return; }
+    container.innerHTML = "";
+    data.reverse().forEach((item, index) => {
+      const isHealthy = item.diagnosis === "Healthy";
+      const badgeBg = isHealthy ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
+      const resultObj = {
+        status: item.diagnosis,
+        confidence: item.confidence,
+        risk_category: item.risk_category || "low_risk",
+        recommended_drug: item.recommended_drug || null
+      };
+      const encodedResult = encodeURIComponent(JSON.stringify(resultObj));
+      container.innerHTML += `
+        <div onclick="loadHistoryResult('${encodedResult}')"
+          class="bg-gray-50 border rounded-2xl p-4 space-y-2 cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gray-400">#${data.length - index}</span>
+            <span class="text-xs font-bold px-2 py-1 rounded-full ${badgeBg}">${item.diagnosis}</span>
+          </div>
+          <p class="text-xs text-gray-400">${new Date(item.created_at).toLocaleString()}</p>
+          <div class="grid grid-cols-2 gap-2 text-sm mt-1">
+            <div><p class="text-gray-400 text-xs uppercase">Confidence</p><p class="font-bold">${item.confidence}%</p></div>
+            <div><p class="text-gray-400 text-xs uppercase">Risk</p><p class="font-bold">${(item.risk_category || "N/A").replace("_", " ").toUpperCase()}</p></div>
+            <div class="col-span-2"><p class="text-gray-400 text-xs uppercase">Drug</p><p class="font-bold">${item.recommended_drug || "None"}</p></div>
+          </div>
+          <p class="text-xs text-pink-500 font-semibold pt-1">Click to view full result →</p>
+        </div>`;
+    });
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = `<p class="text-red-400 text-sm">Server error.</p>`;
+  }
+}
+
+function loadHistoryResult(encodedResult) {
+  const parsed = JSON.parse(decodeURIComponent(encodedResult));
+  localStorage.setItem("result", JSON.stringify(parsed));
+  document.getElementById("historyPanel").classList.remove("open");
+  document.getElementById("historyOverlay").classList.add("hidden");
+  renderResult(parsed);
+}
+
+// LOAD RESULT
+let result = JSON.parse(localStorage.getItem("result"));
+if (!result) {
+  alert("No result found. Please run diagnosis first.");
+  window.location.href = "input.html";
+}
+
+function renderResult(r) {
+  const statusText    = document.getElementById("statusText");
+  const statusMessage = document.getElementById("statusMessage");
+  const confidenceText  = document.getElementById("confidenceText");
+  const confidenceBar   = document.getElementById("confidenceBar");
+  const confidenceLabel = document.getElementById("confidenceLabel");
+  const riskText = document.getElementById("riskText");
+  const riskBar  = document.getElementById("riskBar");
+  const drugText = document.getElementById("drugText");
+
+  statusText.className = "text-3xl font-bold";
+  riskText.className   = "text-3xl font-bold";
+  riskBar.style.display = "";
+
+  if (r.status === "Healthy") {
+    statusText.innerText = "Healthy";
+    statusText.classList.add("text-green-600");
+    statusMessage.innerText = "No cancer detected. Patient is healthy.";
+    statusMessage.className = "text-green-500 mb-8";
+  } else {
+    statusText.innerText = "Cancer Detected";
+    statusText.classList.add("text-red-700");
+    statusMessage.innerText = "Our AI model has identified malignant characteristics.";
+    statusMessage.className = "text-red-500 mb-8";
+  }
+
+  const confidence = parseFloat(r.confidence || 0);
+  confidenceText.innerText = confidence + "%";
+  confidenceBar.style.width = confidence + "%";
+  if (confidence > 80) confidenceLabel.innerText = "↑ High";
+  else if (confidence > 50) confidenceLabel.innerText = "→ Medium";
+  else confidenceLabel.innerText = "↓ Low";
+
+  let risk = r.risk_category || "low_risk";
+  if (r.status === "Healthy") {
+    riskText.innerText = "NO RISK";
+    riskText.classList.add("text-green-600");
+    riskBar.style.width = "0%";
+    riskBar.style.display = "none";
+  } else {
+    riskText.innerText = risk.replace("_", " ").toUpperCase();
+    let riskPercent = 30;
+    if (risk === "medium_risk") riskPercent = 60;
+    if (risk === "high_risk")   riskPercent = 90;
+    riskBar.style.width = riskPercent + "%";
+    if (risk === "high_risk")        riskText.classList.add("text-red-600");
+    else if (risk === "medium_risk") riskText.classList.add("text-orange-500");
+    else                             riskText.classList.add("text-green-600");
+  }
+
+  drugText.innerText = r.status === "Healthy" ? "NO DRUG REQUIRED" : (r.recommended_drug || "No Drug Available");
+  result = r;
+}
+
+renderResult(result);
+
+function downloadReport() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 20;
+  let y = 20;
+
+  doc.setFillColor(236, 72, 153);
+  doc.rect(0, 0, pageW, 14, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(11);
+  doc.setFont("helvetica", "bold");
+  doc.text("SmartCare  |  AI Diagnostic Report", margin, 9.5);
+  y = 28;
+
+  doc.setTextColor(15, 23, 42);
+  doc.setFontSize(20);
+  doc.setFont("helvetica", "bold");
+  doc.text("Patient Diagnosis Report", margin, y);
+  y += 8;
+
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(100, 116, 139);
+  doc.text("Generated: " + new Date().toLocaleString(), margin, y);
+  y += 10;
+
+  doc.setDrawColor(236, 72, 153);
+  doc.setLineWidth(0.5);
+  doc.line(margin, y, pageW - margin, y);
+  y += 10;
+
+  function row(label, value, valueColor) {
+    doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(100, 116, 139);
+    doc.text(label.toUpperCase(), margin, y);
+    doc.setFontSize(13); doc.setFont("helvetica", "bold");
+    if (valueColor) doc.setTextColor(...valueColor); else doc.setTextColor(15, 23, 42);
+    doc.text(String(value), margin, y + 7);
+    y += 18;
+  }
+
+  const isHealthy = result.status === "Healthy";
+  row("Diagnosis Status", result.status, isHealthy ? [22, 163, 74] : [220, 38, 38]);
+
+  doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(100, 116, 139);
+  doc.text("MODEL CONFIDENCE", margin, y);
+  doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(15, 23, 42);
+  doc.text(result.confidence + "%", margin, y + 7);
+  const barW = pageW - margin * 2;
+  const filledW = (parseFloat(result.confidence) / 100) * barW;
+  doc.setFillColor(229, 231, 235);
+  doc.roundedRect(margin, y + 11, barW, 4, 2, 2, "F");
+  doc.setFillColor(236, 72, 153);
+  doc.roundedRect(margin, y + 11, filledW, 4, 2, 2, "F");
+  y += 24;
+
+  const riskDisplay = isHealthy ? "NO RISK" : (result.risk_category || "low_risk").replace("_", " ").toUpperCase();
+  const riskColorMap = { "HIGH RISK": [220,38,38], "MEDIUM RISK": [234,88,12], "LOW RISK": [22,163,74], "NO RISK": [22,163,74] };
+  row("Overall Risk", riskDisplay, riskColorMap[riskDisplay] || [15, 23, 42]);
+
+  const drugDisplay = isHealthy ? "NO DRUG REQUIRED" : (result.recommended_drug || "No Drug Available");
+  row("Recommended Drug", drugDisplay);
+
+  doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.3);
+  doc.line(margin, y, pageW - margin, y);
+  y += 10;
+
+  doc.setFontSize(8); doc.setFont("helvetica", "italic"); doc.setTextColor(148, 163, 184);
+  doc.text("This report is generated by SmartCare AI and is intended for clinical reference only.", margin, y);
+  y += 5;
+  doc.text("Please consult a qualified medical professional before making any treatment decisions.", margin, y);
+
+  const pageH = doc.internal.pageSize.getHeight();
+  doc.setFillColor(236, 72, 153);
+  doc.rect(0, pageH - 8, pageW, 8, "F");
+
+  doc.save("SmartCare_Report.pdf");
+}
+
+</script>
+
+</body>
+</html>

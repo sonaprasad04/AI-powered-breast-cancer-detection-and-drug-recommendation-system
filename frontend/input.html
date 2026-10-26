@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SmartCare - Patient Diagnosis</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+
+<style>
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.font-serif {
+  font-family: 'Playfair Display', serif;
+}
+/* History panel slide-in */
+#historyPanel {
+  transition: transform 0.3s ease;
+  transform: translateX(100%);
+}
+#historyPanel.open {
+  transform: translateX(0);
+}
+</style>
+
+</head>
+
+<body class="bg-[#F5F6F8] text-slate-900">
+
+<!-- HEADER -->
+<div class="flex items-center justify-between gap-3 p-6 border-b bg-white">
+  <div class="flex items-center gap-3">
+    <!-- UNIFIED LOGO -->
+    <div class="w-12 h-12 bg-pink-500 rounded-2xl flex items-center justify-center shadow-md">
+      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24">
+        <path d="M4 14L8 10L12 14L16 8L20 12"
+          stroke="white" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1 class="text-xl font-bold">SmartCare</h1>
+  </div>
+
+  <div class="flex items-center gap-6">
+
+    <!-- HISTORY BUTTON -->
+    <button onclick="toggleHistory()"
+      class="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-pink-600 transition uppercase tracking-wide">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      History
+    </button>
+
+    <!-- LOGOUT BUTTON -->
+    <button onclick="logout()"
+      class="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-pink-600 transition uppercase tracking-wide">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
+      </svg>
+      Logout
+    </button>
+
+  </div>
+</div>
+
+<!-- ================= HISTORY SLIDE PANEL ================= -->
+<div id="historyOverlay"
+  class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"
+  onclick="toggleHistory()">
+</div>
+
+<div id="historyPanel"
+  class="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 flex flex-col">
+  <div class="flex items-center justify-between px-6 py-5 border-b">
+    <h2 class="text-xl font-bold">Diagnosis History</h2>
+    <button onclick="toggleHistory()" class="text-gray-400 hover:text-gray-700 text-2xl leading-none">&times;</button>
+  </div>
+  <div id="historyContent" class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+    <p class="text-gray-400 text-sm">Loading history...</p>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="max-w-6xl mx-auto px-6 py-8">
+
+  <h1 class="text-4xl font-serif font-bold mb-2">Patient Diagnosis</h1>
+  <p class="text-gray-500 mb-10">
+    Enter clinical parameters for breast cancer detection and drug recommendation.
+  </p>
+
+  <form id="diagnosisForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border">
+      <label class="text-xs font-bold uppercase text-gray-500">Radius Mean</label>
+      <div class="mt-4 flex border rounded-2xl overflow-hidden">
+        <span class="px-4 py-3 bg-gray-50 text-gray-400">mm</span>
+        <input id="radius_mean" type="number" placeholder="0" class="flex-1 px-4 py-3 text-xl outline-none">
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border">
+      <label class="text-xs font-bold uppercase text-gray-500">Area Mean</label>
+      <div class="mt-4 flex border rounded-2xl overflow-hidden">
+        <span class="px-4 py-3 bg-gray-50 text-gray-400">mm²</span>
+        <input id="area_mean" type="number" placeholder="0" class="flex-1 px-4 py-3 text-xl outline-none">
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border">
+      <label class="text-xs font-bold uppercase text-gray-500">Radius Worst</label>
+      <div class="mt-4 flex border rounded-2xl overflow-hidden">
+        <span class="px-4 py-3 bg-gray-50 text-gray-400">mm</span>
+        <input id="radius_worst" type="number" placeholder="0" class="flex-1 px-4 py-3 text-xl outline-none">
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border">
+      <label class="text-xs font-bold uppercase text-gray-500">Area Worst</label>
+      <div class="mt-4 flex border rounded-2xl overflow-hidden">
+        <span class="px-4 py-3 bg-gray-50 text-gray-400">mm²</span>
+        <input id="area_worst" type="number" placeholder="0" class="flex-1 px-4 py-3 text-xl outline-none">
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border">
+      <label class="text-xs font-bold uppercase text-gray-500">Perimeter Mean</label>
+      <div class="mt-4 flex border rounded-2xl overflow-hidden">
+        <span class="px-4 py-3 bg-gray-50 text-gray-400">mm</span>
+        <input id="perimeter_mean" type="number" placeholder="0" class="flex-1 px-4 py-3 text-xl outline-none">
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-3xl shadow-sm border">
+      <label class="text-xs font-bold uppercase text-gray-500">Perimeter Worst</label>
+      <div class="mt-4 flex border rounded-2xl overflow-hidden">
+        <span class="px-4 py-3 bg-gray-50 text-gray-400">mm</span>
+        <input id="perimeter_worst" type="number" placeholder="0" class="flex-1 px-4 py-3 text-xl outline-none">
+      </div>
+    </div>
+
+    <div class="col-span-1 md:col-span-2 lg:col-span-3 flex justify-center mt-6">
+      <button type="submit"
+        class="bg-pink-600 text-white px-12 py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-95 transition">
+        Run Diagnostic Analysis
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+
+let historyLoaded = false;
+
+async function toggleHistory() {
+  const panel = document.getElementById("historyPanel");
+  const overlay = document.getElementById("historyOverlay");
+  const isOpen = panel.classList.contains("open");
+  if (isOpen) {
+    panel.classList.remove("open");
+    overlay.classList.add("hidden");
+  } else {
+    panel.classList.add("open");
+    overlay.classList.remove("hidden");
+    if (!historyLoaded) {
+      await loadHistory();
+      historyLoaded = true;
+    }
+  }
+}
+
+async function loadHistory() {
+  const token = localStorage.getItem("token");
+  const container = document.getElementById("historyContent");
+  if (!token) { container.innerHTML = `<p class="text-red-400 text-sm">Not logged in.</p>`; return; }
+  container.innerHTML = `<p class="text-gray-400 text-sm">Loading...</p>`;
+  try {
+    const response = await fetch(`${API_URL}/my-patients`, {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await response.json();
+    if (!response.ok) { container.innerHTML = `<p class="text-red-400 text-sm">Error loading history.</p>`; return; }
+    if (data.length === 0) { container.innerHTML = `<p class="text-gray-400 text-sm">No records found.</p>`; return; }
+    container.innerHTML = "";
+    data.reverse().forEach((item, index) => {
+      const isHealthy = item.diagnosis === "Healthy";
+      const badgeBg = isHealthy ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
+      const resultObj = {
+        status: item.diagnosis,
+        confidence: item.confidence,
+        risk_category: item.risk_category || "low_risk",
+        recommended_drug: item.recommended_drug || null
+      };
+      const encodedResult = encodeURIComponent(JSON.stringify(resultObj));
+      container.innerHTML += `
+        <div onclick="viewResult('${encodedResult}')"
+          class="bg-gray-50 border rounded-2xl p-4 space-y-2 cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gray-400">#${data.length - index}</span>
+            <span class="text-xs font-bold px-2 py-1 rounded-full ${badgeBg}">${item.diagnosis}</span>
+          </div>
+          <p class="text-xs text-gray-400">${new Date(item.created_at).toLocaleString()}</p>
+          <div class="grid grid-cols-2 gap-2 text-sm mt-1">
+            <div><p class="text-gray-400 text-xs uppercase">Confidence</p><p class="font-bold">${item.confidence}%</p></div>
+            <div><p class="text-gray-400 text-xs uppercase">Risk</p><p class="font-bold">${(item.risk_category || "N/A").replace("_", " ").toUpperCase()}</p></div>
+            <div class="col-span-2"><p class="text-gray-400 text-xs uppercase">Drug</p><p class="font-bold">${item.recommended_drug || "None"}</p></div>
+          </div>
+          <p class="text-xs text-pink-500 font-semibold pt-1">Click to view full result →</p>
+        </div>`;
+    });
+  } catch (error) {
+    console.error(error);
+    container.innerHTML = `<p class="text-red-400 text-sm">Server error.</p>`;
+  }
+}
+
+function viewResult(encodedResult) {
+  localStorage.setItem("result", decodeURIComponent(encodedResult));
+  window.location.href = "detection.html";
+}
+
+document.getElementById("diagnosisForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  const token = localStorage.getItem("token");
+  if (!token) { alert("Please login first ❌"); window.location.href = "login.html"; return; }
+  const data = {
+    radius_mean: parseFloat(document.getElementById("radius_mean").value),
+    area_mean: parseFloat(document.getElementById("area_mean").value),
+    radius_worst: parseFloat(document.getElementById("radius_worst").value),
+    area_worst: parseFloat(document.getElementById("area_worst").value),
+    perimeter_mean: parseFloat(document.getElementById("perimeter_mean").value),
+    perimeter_worst: parseFloat(document.getElementById("perimeter_worst").value)
+  };
+  try {
+    const response = await fetch(`${API_URL}/predict`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (response.ok) {
+      localStorage.setItem("result", JSON.stringify(result));
+      window.location.href = "detection.html";
+    } else {
+      alert(result.detail || "Prediction failed ❌");
+    }
+  } catch (error) {
+    console.error(error);
+    alert("Server error ❌");
+  }
+});
+
+</script>
+
+</body>
+</html>
