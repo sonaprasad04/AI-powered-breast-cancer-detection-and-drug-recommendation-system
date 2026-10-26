@@ -50,8 +50,6 @@ Joblib
 
 SQLAlchemy and SQLite
 
-Pydantic
-
 Passlib with bcrypt
 
 python-jose for JWT handling
@@ -112,44 +110,7 @@ datasets/Compounds-annotation.csv
 
 This file is present in the project. Its role in the current application has not been verified.
 
-7. Project Structure
-
-The following is based on the visible project files; there may be additional files in collapsed folders.
-
-SMARTCARE/
-├── backend/
-│   ├── auth.py
-│   ├── cancer_model.pkl
-│   ├── database.py
-│   ├── dependencies.py
-│   ├── drug_logic.py
-│   ├── jwt_token.py
-│   ├── main.py
-│   ├── models.py
-│   ├── schemas.py
-│   ├── security.py
-│   └── smartcare.db
-│
-├── datasets/
-│   ├── breast_cancer.csv
-│   ├── Compounds-annotation.csv
-│   └── GDSC_DATASET.csv
-│
-├── frontend/
-│   ├── detection.html
-│   ├── input.html
-│   ├── login.html
-│   └── register.html
-│
-├── cancer_classification.ipynb
-├── drug_response_prediction.ipynb
-├── final_integration.ipynb
-├── pca.ipynb
-├── cancer_model.pkl
-├── drug_model.pkl
-└── README.md
-
-8. Setup and Installation
+7. Setup and Installation
 
 Prerequisites
 
@@ -226,7 +187,7 @@ This opens FastAPI's interactive API documentation.
 
 Startup note: Importing drug_logic.py loads the GDSC CSV and trains its regression model. The first startup may take time. If the dataset cannot be loaded or the required columns are missing, inspect the terminal output.
 
-9. API Endpoints
+8. API Endpoints
 
 The following endpoints are present in the provided code:
 
@@ -304,7 +265,7 @@ Prediction history
 
 GET /my-patients requires a bearer token and returns records belonging to the authenticated user.
 
-10. Database
+9. Database
 
 The backend configures SQLite using sqlite:///./smartcare.db. When the server is started from the backend/ directory, the database is expected at backend/smartcare.db.
 
@@ -316,7 +277,7 @@ patients: submitted measurements, diagnosis, confidence, risk category, recommen
 
 Keep the database private if it contains real or identifiable data. Use synthetic data for demonstrations.
 
-11. Frontend
+10. Frontend
 
 The frontend/ directory contains these HTML files:
 
@@ -330,7 +291,7 @@ detection.html
 
 The contents of these pages have not been reviewed here, so the exact navigation flow, styling, and API integration are not documented as confirmed. The backend API can be explored independently at http://127.0.0.1:8000/docs after starting the server.
 
-12. Security and Deployment Notes
+11. Security and Deployment Notes
 
 jwt_token.py currently contains a hardcoded JWT secret. Do not publish that secret or deploy it as-is. Load a strong secret from an environment variable.
 
@@ -342,7 +303,7 @@ Do not commit credentials, secrets, or a database containing sensitive informati
 
 Authentication and authorization should be tested before using the application beyond a local demonstration.
 
-13. Limitations and Future Work
+12. Limitations and Future Work
 
 Confirm the classifier's class encoding and evaluate it on an independent test set.
 
@@ -356,6 +317,6 @@ Review frontend/API integration and add automated tests.
 
 Configure secure secrets, CORS, and deployment settings.
 
-14. Conclusion
+13. Conclusion
 
 SMARTCARE demonstrates an integration of a saved machine-learning classifier, a prototype drug-selection workflow, a FastAPI backend, JWT-based authentication, and SQLite persistence. It is a starting point for academic experimentation. Further testing, model validation, and security improvements are needed before any real-world or clinical use.
