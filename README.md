@@ -189,48 +189,6 @@ Startup note: Importing drug_logic.py loads the GDSC CSV and trains its regressi
 
 8. API Endpoints
 
-The following endpoints are present in the provided code:
-
-Method
-
-Endpoint
-
-Purpose
-
-Authentication
-
-POST
-
-/register
-
-Register a user
-
-No
-
-POST
-
-/login
-
-Verify credentials and return a JWT
-
-No
-
-POST
-
-/predict
-
-Return classification and, if applicable, a drug selection
-
-Yes
-
-GET
-
-/my-patients
-
-Retrieve the logged-in user's prediction history
-
-Yes
-
 Register
 
 POST /register accepts JSON:
